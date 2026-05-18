@@ -1,0 +1,164 @@
+name: Build OpenWrt packages
+run-name: "OpenWrt ${{ github.event.inputs.version || inputs.tag_name || github.ref_name }}"
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+      package:
+        required: false
+        type: string
+        default: all
+      include:
+        required: false
+        type: string
+        default: "*"
+      exclude:
+        required: false
+        type: string
+        default: "microchipsw/lan969x"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "OpenWrt version, for example 25.12.5"
+        required: true
+        type: string
+      package:
+        description: "Package to build, or all"
+        required: true
+        type: string
+        default: all
+      include:
+        description: "Include target/subtarget patterns, comma-separated"
+        required: false
+        type: string
+        default: "*"
+      exclude:
+        description: "Exclude target/subtarget patterns, comma-separated"
+        required: false
+        type: string
+        default: "microchipsw/lan969x"
+permissions:
+  contents: write
+jobs:
+  generate-config:
+    runs-on: ubuntu-latest
+    outputs:
+      job-config: ${{ steps.generate-config.outputs.job-config }}
+      package: ${{ steps.inputs.outputs.package }}
+      version: ${{ steps.inputs.outputs.version }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+      - name: Resolve inputs
+        id: inputs
+        shell: bash
+        run: |
+          event_name="${{ github.event_name }}"
+          version=""
+          package="all"
+          include="*"
+          exclude="microchipsw/lan969x"
+
+          if [[ "$event_name" == "workflow_dispatch" ]]; then
+            version="${{ inputs.version }}"
+            package="${{ inputs.package }}"
+            include="${{ inputs.include }}"
+            exclude="${{ inputs.exclude }}"
+          elif [[ "$event_name" == "workflow_call" ]]; then
+            version="${{ inputs.tag_name }}"
+            package="${{ inputs.package }}"
+            include="${{ inputs.include }}"
+            exclude="${{ inputs.exclude }}"
+          else
+            version="${GITHUB_REF_NAME#v}"
+          fi
+
+          version="${version#v}"
+
+          if [[ -z "$version" ]]; then
+            echo "OpenWrt version is empty" >&2
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "INCLUDE=$include" >> "$GITHUB_ENV"
+          echo "EXCLUDE=$exclude" >> "$GITHUB_ENV"
+      - name: Generate matrix
+        id: generate-config
+        shell: bash
+        run: |
+          chmod +x ./openwrt-matrix.py
+          ./openwrt-matrix.py "$VERSION" "$INCLUDE" "$EXCLUDE"
+  build:
+    name: "v${{ matrix.build_env.tag }} - ${{ matrix.build_env.pkgarch }} :: ${{ matrix.build_env.target }}/${{ matrix.build_env.subtarget }}"
+    runs-on: ubuntu-latest
+    needs: generate-config
+    strategy:
+      fail-fast: false
+      matrix:
+        build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+      - name: Install host build dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            bison \
+            curl \
+            file \
+            flex \
+            gawk \
+            gettext \
+            git \
+            gzip \
+            libncurses-dev \
+            libssl-dev \
+            python3 \
+            python3-pyelftools \
+            rsync \
+            unzip \
+            wget \
+            xz-utils \
+            zstd
+      - name: Cache OpenWrt SDK archive
+        id: cache-sdk
+        uses: actions/cache@v5
+        with:
+          path: .openwrt-build/openwrt-sdk-*.tar.*
+          key: ${{ runner.os }}-openwrt-sdk-${{ matrix.build_env.tag }}-${{ matrix.build_env.target }}-${{ matrix.build_env.subtarget }}
+      - name: Build packages
+        shell: bash
+        run: |
+          chmod +x ./openwrt-build.sh
+          ./openwrt-build.sh \
+            build-target \
+            "${{ needs.generate-config.outputs.package }}" \
+            "${{ matrix.build_env.tag }}" \
+            "${{ matrix.build_env.target }}" \
+            "${{ matrix.build_env.subtarget }}" \
+            "${{ matrix.build_env.pkgarch }}" \
+            release
+      - name: Upload artifacts for act
+        if: ${{ env.ACT }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: openwrt-v${{ matrix.build_env.tag }}-${{ matrix.build_env.pkgarch }}-${{ matrix.build_env.target }}-${{ matrix.build_env.subtarget }}
+          path: release/*.apk
+          if-no-files-found: error
+      - name: Release
+        if: ${{ !env.ACT }}
+        uses: softprops/action-gh-release@v3
+        with:
+          files: release/*.apk
+          tag_name: v${{ matrix.build_env.tag }}
