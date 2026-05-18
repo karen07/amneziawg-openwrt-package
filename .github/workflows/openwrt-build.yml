@@ -1,0 +1,54 @@
+name: Build OpenWrt packages
+run-name: "OpenWrt ${{ github.event.inputs.version || inputs.tag_name || github.ref_name }}"
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+      package:
+        required: false
+        type: string
+        default: all
+      include:
+        required: false
+        type: string
+        default: "*"
+      exclude:
+        required: false
+        type: string
+        default: "microchipsw/lan969x"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "OpenWrt version, for example 25.12.5"
+        required: true
+        type: string
+      package:
+        description: "Package to build, or all"
+        required: true
+        type: string
+        default: all
+      include:
+        description: "Include target/subtarget patterns, comma-separated"
+        required: false
+        type: string
+        default: "*"
+      exclude:
+        description: "Exclude target/subtarget patterns, comma-separated"
+        required: false
+        type: string
+        default: "microchipsw/lan969x"
+permissions:
+  contents: write
+jobs:
+  build:
+    uses: karen07/openwrt-package-ci/.github/workflows/openwrt-build.yml@main
+    with:
+      tag_name: ${{ github.event.inputs.version || inputs.tag_name || github.ref_name }}
+      package: ${{ github.event.inputs.package || inputs.package || 'all' }}
+      include: ${{ github.event.inputs.include || inputs.include || '*' }}
+      exclude: ${{ github.event.inputs.exclude || inputs.exclude || 'microchipsw/lan969x' }}
