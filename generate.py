@@ -174,7 +174,7 @@ AWG_OPTS = [
 
 
 AWG_TOOLS_VERSION = "3.1.20260812"
-AWG_KERNEL_VERSION = "3.1.20260812"
+AWG_KERNEL_VERSION = "3.1.20260828"
 AWG_TOOLS_REPO = os.environ.get(
     "AWG_TOOLS_REPO",
     "https://github.com/amnezia-vpn/amneziawg-tools.git",
@@ -183,7 +183,7 @@ AWG_KERNEL_REPO = os.environ.get(
     "AWG_KERNEL_REPO",
     "https://github.com/amnezia-vpn/amneziawg-linux-kernel-module.git",
 )
-AWG_LUCI_VERSION = "3.1.20260812"
+AWG_LUCI_VERSION = "3.1.0"
 AWG_LUCI_NAME = "luci-proto-amneziawg"
 PROJECT_AUTHOR = "Karen Khachatryan"
 PROJECT_EMAIL = "karen0734@gmail.com"

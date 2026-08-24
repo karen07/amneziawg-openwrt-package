@@ -2,6 +2,7 @@
 # Copyright (C) 2016-2019 Jason A. Donenfeld <Jason@zx2c4.com>
 # Copyright (C) 2016 Baptiste Jonglez <openwrt@bitsofnetworks.org>
 # Copyright (C) 2016-2017 Dan Luedtke <mail@danrl.com>
+# Copyright (C) 2026 Karen Khachatryan <karen0734@gmail.com>
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -10,12 +11,12 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=amneziawg-tools
 
-PKG_VERSION:=1.0.20250521
+PKG_VERSION:=3.1.20260812
 PKG_RELEASE:=1
 
-PKG_SOURCE:=amneziawg-tools-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=https://git.zx2c4.com/amneziawg-tools/snapshot/
-PKG_HASH:=b6f2628b85b1b23cc06517ec9c74f82d52c4cdbd020f3dd2f00c972a1782950e
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/amnezia-vpn/amneziawg-tools.git
+PKG_SOURCE_VERSION:=v$(PKG_VERSION)
 
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
@@ -31,8 +32,8 @@ define Package/amneziawg-tools
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=VPN
-  URL:=https://www.amneziawg.com
-  MAINTAINER:=Jason A. Donenfeld <Jason@zx2c4.com>
+  URL:=https://amnezia.org/
+  MAINTAINER:=Karen Khachatryan <karen0734@gmail.com>
   TITLE:=AmneziaWG userspace control program (awg)
   DEPENDS:= \
 	  +!BUSYBOX_CONFIG_IP:ip \
@@ -54,7 +55,7 @@ endef
 
 define Package/amneziawg-tools/install
 	$(INSTALL_DIR) $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/awg $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/wg $(1)/usr/bin/awg
 	$(INSTALL_BIN) ./files/amneziawg_watchdog $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/lib/netifd/proto/
 	$(INSTALL_BIN) ./files/amneziawg.sh $(1)/lib/netifd/proto/
