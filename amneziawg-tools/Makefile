@@ -8,13 +8,13 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=wireguard-tools
+PKG_NAME:=amneziawg-tools
 
 PKG_VERSION:=1.0.20250521
 PKG_RELEASE:=1
 
-PKG_SOURCE:=wireguard-tools-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=https://git.zx2c4.com/wireguard-tools/snapshot/
+PKG_SOURCE:=amneziawg-tools-$(PKG_VERSION).tar.xz
+PKG_SOURCE_URL:=https://git.zx2c4.com/amneziawg-tools/snapshot/
 PKG_HASH:=b6f2628b85b1b23cc06517ec9c74f82d52c4cdbd020f3dd2f00c972a1782950e
 
 PKG_LICENSE:=GPL-2.0
@@ -27,37 +27,37 @@ include $(INCLUDE_DIR)/package.mk
 MAKE_PATH:=src
 MAKE_VARS += PLATFORM=linux
 
-define Package/wireguard-tools
+define Package/amneziawg-tools
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=VPN
-  URL:=https://www.wireguard.com
+  URL:=https://www.amneziawg.com
   MAINTAINER:=Jason A. Donenfeld <Jason@zx2c4.com>
-  TITLE:=WireGuard userspace control program (wg)
+  TITLE:=AmneziaWG userspace control program (awg)
   DEPENDS:= \
 	  +!BUSYBOX_CONFIG_IP:ip \
 	  +!BUSYBOX_CONFIG_FEATURE_IP_LINK:ip \
-	  +kmod-wireguard
+	  +kmod-amneziawg
 endef
 
-define Package/wireguard-tools/description
-  WireGuard is a novel VPN that runs inside the Linux Kernel and utilizes
+define Package/amneziawg-tools/description
+  AmneziaWG is a novel VPN that runs inside the Linux Kernel and utilizes
   state-of-the-art cryptography. It aims to be faster, simpler, leaner, and
   more useful than IPSec, while avoiding the massive headache. It intends to
-  be considerably more performant than OpenVPN.  WireGuard is designed as a
+  be considerably more performant than OpenVPN.  AmneziaWG is designed as a
   general purpose VPN for running on embedded interfaces and super computers
   alike, fit for many different circumstances. It uses UDP.
 
-  This package provides the userspace control program for WireGuard,
-  `wg(8)`, a netifd protocol helper, and a re-resolve watchdog script.
+  This package provides the userspace control program for AmneziaWG,
+  `awg(8)`, a netifd protocol helper, and a re-resolve watchdog script.
 endef
 
-define Package/wireguard-tools/install
+define Package/amneziawg-tools/install
 	$(INSTALL_DIR) $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/wg $(1)/usr/bin/
-	$(INSTALL_BIN) ./files/wireguard_watchdog $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/awg $(1)/usr/bin/
+	$(INSTALL_BIN) ./files/amneziawg_watchdog $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/lib/netifd/proto/
-	$(INSTALL_BIN) ./files/wireguard.sh $(1)/lib/netifd/proto/
+	$(INSTALL_BIN) ./files/amneziawg.sh $(1)/lib/netifd/proto/
 endef
 
-$(eval $(call BuildPackage,wireguard-tools))
+$(eval $(call BuildPackage,amneziawg-tools))

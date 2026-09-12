@@ -3,9 +3,9 @@
 # Licensed to the public under the Apache License 2.0.
 # shellcheck disable=SC2317
 
-WG=/usr/bin/wg
-if [ ! -x $WG ]; then
-	logger -t "wireguard" "error: missing wireguard-tools (${WG})"
+AWG=/usr/bin/awg
+if [ ! -x $AWG ]; then
+	logger -t "amneziawg" "error: missing amneziawg-tools (${AWG})"
 	exit 0
 fi
 
@@ -15,7 +15,7 @@ fi
 	init_proto "$@"
 }
 
-proto_wireguard_init_config() {
+proto_amneziawg_init_config() {
 	renew_handler=1
 	peer_detect=1
 
@@ -34,13 +34,13 @@ ensure_key_is_generated() {
 	private_key="$(uci get network."$1".private_key)"
 
 	if [ "$private_key" = "generate" ] || [ -z "$private_key" ]; then
-		private_key="$("${WG}" genkey)"
+		private_key="$("${AWG}" genkey)"
 		uci -q set network."$1".private_key="$private_key" && \
 			uci -q commit network
 	fi
 }
 
-proto_wireguard_setup() {
+proto_amneziawg_setup() {
 	local config="$1"
 
 	local private_key listen_port mtu fwmark addresses ip6prefix nohostroute tunlink
@@ -57,22 +57,22 @@ proto_wireguard_setup() {
 	config_get tunlink "${config}" "tunlink"
 
 	# Add the link only if it didn't already exist
-	ip -br link show "${config}" >/dev/null 2>&1 || ip link add dev "${config}" type wireguard
+	ip -br link show "${config}" >/dev/null 2>&1 || ip link add dev "${config}" type amneziawg
 
 	[ -n "${mtu}" ] && ip link set mtu "${mtu}" dev "${config}"
 
 	proto_init_update "${config}" 1
 
-	# Build WireGuard configuration entirely in memory
-	local wg_config="[Interface]\n"
-	wg_config="${wg_config}PrivateKey=${private_key}\n"
-	[ -n "${listen_port}" ]	&& wg_config="${wg_config}ListenPort=${listen_port}\n"
-	[ -n "${fwmark}" ]		&& wg_config="${wg_config}FwMark=${fwmark}\n"
+	# Build AmneziaWG configuration entirely in memory
+	local awg_config="[Interface]\n"
+	awg_config="${awg_config}PrivateKey=${private_key}\n"
+	[ -n "${listen_port}" ]	&& awg_config="${awg_config}ListenPort=${listen_port}\n"
+	[ -n "${fwmark}" ]		&& awg_config="${awg_config}FwMark=${fwmark}\n"
 
-	# Collect peer configs into wg_config as well
+	# Collect peer configs into awg_config as well
 	local peer_config
 	peer_config=""
-	proto_wireguard_setup_peer_collect() {
+	proto_amneziawg_setup_peer_collect() {
 		local section="$1"
 		local peer_block
 
@@ -111,17 +111,17 @@ proto_wireguard_setup() {
 
 	}
 
-	config_foreach proto_wireguard_setup_peer_collect "wireguard_${config}"
+	config_foreach proto_amneziawg_setup_peer_collect "amneziawg_${config}"
 
 	# Combine interface + peer config into one variable
-	wg_config="${wg_config}${peer_config}"
+	awg_config="${awg_config}${peer_config}"
 
-	# Apply configuration directly using wg syncconf via stdin
-	printf "%b" "$wg_config" | ${WG} syncconf "${config}" /dev/stdin
-	local WG_RETURN=$?
+	# Apply configuration directly using awg syncconf via stdin
+	printf "%b" "$awg_config" | ${AWG} syncconf "${config}" /dev/stdin
+	local AWG_RETURN=$?
 
-	if [ ${WG_RETURN} -ne 0 ]; then
-		echo "Could not sync WireGuard configuration"
+	if [ ${AWG_RETURN} -ne 0 ]; then
+		echo "Could not sync AmneziaWG configuration"
 		sleep 5
 		proto_setup_failed "${config}"
 		exit 1
@@ -143,7 +143,7 @@ proto_wireguard_setup() {
 
 	# Endpoint dependency tracking
 	if [ "${nohostroute}" != "1" ]; then
-		wg show "${config}" endpoints | \
+		awg show "${config}" endpoints | \
 		sed -E 's/\[?([0-9.:a-f]+)\]?:([0-9]+)/\1 \2/' | \
 		while IFS=$'\t ' read -r key address port; do
 			[ -n "${port}" ] || continue
@@ -154,16 +154,16 @@ proto_wireguard_setup() {
 	proto_send_update "${config}"
 }
 
-proto_wireguard_renew() {
+proto_amneziawg_renew() {
 	local interface="$1"
-	proto_wireguard_setup "$interface"
+	proto_amneziawg_setup "$interface"
 }
 
-proto_wireguard_teardown() {
+proto_amneziawg_teardown() {
 	local config="$1"
 	ip link del dev "${config}" >/dev/null 2>&1
 }
 
 [ -n "$INCLUDE_ONLY" ] || {
-	add_protocol wireguard
+	add_protocol amneziawg
 }

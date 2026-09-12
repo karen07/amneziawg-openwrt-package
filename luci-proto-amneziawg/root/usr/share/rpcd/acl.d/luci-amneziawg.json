@@ -1,17 +1,17 @@
 {
-	"luci-proto-wireguard": {
-		"description": "Grant access to LuCI Wireguard procedures",
+	"luci-proto-amneziawg": {
+		"description": "Grant access to LuCI AmneziaWG procedures",
 		"read": {
 			"ubus": {
-				"luci.wireguard": [
-					"getWgInstances"
+				"luci.amneziawg": [
+					"getAwgInstances"
 				]
 			},
 			"uci": [ "ddns", "system" ]
 		},
 		"write": {
 			"ubus": {
-				"luci.wireguard": [
+				"luci.amneziawg": [
 					"generateKeyPair",
 					"getPublicAndPrivateKeyFromPrivate",
 					"generatePsk"

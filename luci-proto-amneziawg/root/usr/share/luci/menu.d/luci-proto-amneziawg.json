@@ -1,13 +1,13 @@
 {
-	"admin/status/wireguard": {
-		"title": "WireGuard",
+	"admin/status/amneziawg": {
+		"title": "AmneziaWG",
 		"order": 92,
 		"action": {
 			"type": "view",
-			"path": "wireguard/status"
+			"path": "amneziawg/status"
 		},
 		"depends": {
-			"acl": [ "luci-proto-wireguard" ],
+			"acl": [ "luci-proto-amneziawg" ],
 			"uci": { "network": true }
 		}
 	}
