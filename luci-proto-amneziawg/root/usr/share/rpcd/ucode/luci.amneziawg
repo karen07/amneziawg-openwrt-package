@@ -1,4 +1,5 @@
 // Copyright 2022 Jo-Philipp Wich <jo@mein.io>
+// Copyright (C) 2026 Karen Khachatryan <karen0734@gmail.com>
 // Licensed to the public under the Apache License 2.0.
 
 'use strict';
@@ -78,7 +79,32 @@ const methods = {
 							name: last_device,
 							public_key: record[2],
 							listen_port: record[3],
-							fwmark: record[4],
+							jc: record[4],
+							jmin: record[5],
+							jmax: record[6],
+							s1: record[7],
+							s2: record[8],
+							s3: record[9],
+							s4: record[10],
+							h1: record[11],
+							h2: record[12],
+							h3: record[13],
+							h4: record[14],
+							i1: record[15],
+							i2: record[16],
+							i3: record[17],
+							i4: record[18],
+							i5: record[19],
+							header_protection_key: record[20] == '(none)' ? '(none)' : '(hidden)',
+							content_padding_addition: record[21],
+							rekey_after_time: record[22],
+							rekey_timeout: record[23],
+							reject_after_time: record[24],
+							keepalive_timeout: record[25],
+							max_handshake_attempts: record[26],
+							random_trailers: record[27],
+							disable_cookies: record[28],
+							fwmark: record[length(record) - 1],
 							peers: []
 						};
 

@@ -1,3 +1,4 @@
+// AmneziaWG modifications: Copyright (C) 2026 Karen Khachatryan <karen0734@gmail.com>
 'use strict';
 'require fs';
 'require ui';
@@ -63,9 +64,18 @@ function buildSVGQRCode(data, code) {
 		whiteColor: 'white',
 		blackColor: 'black'
 	};
-	const svg = uqr.renderSVG(data, options);
-	code.style.opacity = '';
-	dom.content(code, Object.assign(E(svg), { style: 'width:100%;height:auto' }));
+
+	// Large configurations may exceed QR code size limits.
+	try {
+		const svg = uqr.renderSVG(data, options);
+		code.style.opacity = '';
+		dom.content(code, Object.assign(E(svg), { style: 'width:100%;height:auto' }));
+	} catch (e) {
+		console.warn('QR generation failed:', e);
+
+		code.style.opacity = '';
+		dom.content(code, E('div', {'class': 'alert-message warning', 'style': 'margin:0;text-align:center'}, [_('QR code generation failed. The configuration may be too large.')]));
+	}
 }
 
 var cbiKeyPairGenerate = form.DummyValue.extend({
@@ -185,10 +195,126 @@ return network.registerProtocol('amneziawg', {
 		o = s.taboption('advanced', form.DynamicList, 'ip6prefix', _('IPv6 routed prefix'), _('This is the prefix routed to you by your provider for use by clients'));
 		o.datatype = 'cidr6';
 
+		// AmneziaWG specific parameters
+		try {
+			s.tab('amneziawg', _('AmneziaWG Settings'), _('Further information about AmneziaWG interfaces and peers at ' + '<a href=\'https://docs.amnezia.org/documentation/amnezia-wg\'>amnezia.org</a>.'));
+		}
+		catch(e) {}
+
+		o = s.taboption('amneziawg', form.Value, 'awg_jc', _('Jc'), _('Junk packet count, 0-10.'));
+		o.datatype = 'uinteger';
+		o.placeholder = '4';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_jmin', _('Jmin'), _('Junk packet minimum size, 64-1024 bytes.'));
+		o.datatype = 'uinteger';
+		o.placeholder = '64';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_jmax', _('Jmax'), _('Junk packet maximum size, 64-1024 bytes.'));
+		o.datatype = 'uinteger';
+		o.placeholder = '205';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_s1', _('S1'), _('Handshake initiation random prefix size, 0-64 bytes.'));
+		o.datatype = 'uinteger';
+		o.placeholder = '56';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_s2', _('S2'), _('Handshake response random prefix size, 0-64 bytes.'));
+		o.datatype = 'uinteger';
+		o.placeholder = '48';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_s3', _('S3'), _('Cookie reply random prefix size, 0-64 bytes.'));
+		o.datatype = 'uinteger';
+		o.placeholder = '32';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_s4', _('S4'), _('Transport packet random prefix size, 0-32 bytes.'));
+		o.datatype = 'uinteger';
+		o.placeholder = '16';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_h1', _('H1'), _('Handshake initiation packet type header. Number or range, 0-4294967295. H1-H4 ranges must not overlap.'));
+		o.datatype = 'string';
+		o.placeholder = '135792468-135903579';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_h2', _('H2'), _('Handshake response packet type header. Number or range, 0-4294967295. H1-H4 ranges must not overlap.'));
+		o.datatype = 'string';
+		o.placeholder = '864201357-864312468';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_h3', _('H3'), _('Handshake cookie packet type header. Number or range, 0-4294967295. H1-H4 ranges must not overlap.'));
+		o.datatype = 'string';
+		o.placeholder = '2198765432-2198876543';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_h4', _('H4'), _('Transport packet type header. Number or range, 0-4294967295. H1-H4 ranges must not overlap.'));
+		o.datatype = 'string';
+		o.placeholder = '4012345678-4012456789';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_i1', _('I1'), _('First special junk packet signature.'));
+		o.datatype = 'string';
+		o.placeholder = '<r 128>';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_i2', _('I2'), _('Second special junk packet signature.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_i3', _('I3'), _('Third special junk packet signature.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_i4', _('I4'), _('Fourth special junk packet signature.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_i5', _('I5'), _('Fifth special junk packet signature.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_header_protection_key', _('HeaderProtectionKey'), _('Header protection key shared by both sides. 32-byte Base64 key.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_content_padding_addition', _('ContentPaddingAddition'), _('Content padding addition. Number or range, 0-65535 bytes.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_rekey_after_time', _('RekeyAfterTime'), _('Rekey after time. Number or range, 0-65535 seconds.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_rekey_timeout', _('RekeyTimeout'), _('Rekey timeout. Number or range, 0-65535 seconds.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_reject_after_time', _('RejectAfterTime'), _('Reject after time. Number or range, 0-65535 seconds.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_keepalive_timeout', _('KeepaliveTimeout'), _('Keepalive timeout. Number or range, 0-65535 seconds.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Value, 'awg_max_handshake_attempts', _('MaxHandshakeAttempts'), _('Maximum handshake attempts. Number or range, 0-65535 attempts.'));
+		o.datatype = 'string';
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Flag, 'awg_random_trailers', _('RandomTrailers'), _('Enable random packet trailers.'));
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Flag, 'awg_disable_cookies', _('DisableCookies'), _('Disable cookie messages.'));
+		o.optional = true;
+
 		// -- peers -----------------------------------------------------------------------
 
 		try {
-			s.tab('peers', _('Peers'), _('Further information about AmneziaWG interfaces and peers at %s.'.format('<a href=\'http://amneziawg.com\'>amneziawg.com</a>')));
+			s.tab('peers', _('Peers'), _('Further information about AmneziaWG interfaces and peers at ' + '<a href=\'https://docs.amnezia.org/documentation/amnezia-wg\'>amnezia.org</a>.'));
 		}
 		catch(e) {}
 
@@ -306,8 +432,6 @@ return network.registerProtocol('amneziawg', {
 				if (pconf.peer_persistentkeepalive == 'off' || pconf.peer_persistentkeepalive == '0')
 					delete pconf.peer_persistentkeepalive;
 
-				if (!stubValidator.apply('port', pconf.peer_persistentkeepalive || '0'))
-					return _('PersistentKeepAlive setting is invalid');
 			}
 
 			return config;
@@ -336,6 +460,33 @@ return network.registerProtocol('amneziawg', {
 					s.getOption('public_key').getUIElement(s.section).setValue(keypair.pub);
 					s.getOption('listen_port').getUIElement(s.section).setValue(config.interface_listenport || '');
 					s.getOption('addresses').getUIElement(s.section).setValue(config.interface_address);
+
+					// AmneziaWG specific parameters
+					s.getOption('awg_jc').getUIElement(s.section).setValue(config.interface_jc || '');
+					s.getOption('awg_jmin').getUIElement(s.section).setValue(config.interface_jmin || '');
+					s.getOption('awg_jmax').getUIElement(s.section).setValue(config.interface_jmax || '');
+					s.getOption('awg_s1').getUIElement(s.section).setValue(config.interface_s1 || '');
+					s.getOption('awg_s2').getUIElement(s.section).setValue(config.interface_s2 || '');
+					s.getOption('awg_s3').getUIElement(s.section).setValue(config.interface_s3 || '');
+					s.getOption('awg_s4').getUIElement(s.section).setValue(config.interface_s4 || '');
+					s.getOption('awg_h1').getUIElement(s.section).setValue(config.interface_h1 || '');
+					s.getOption('awg_h2').getUIElement(s.section).setValue(config.interface_h2 || '');
+					s.getOption('awg_h3').getUIElement(s.section).setValue(config.interface_h3 || '');
+					s.getOption('awg_h4').getUIElement(s.section).setValue(config.interface_h4 || '');
+					s.getOption('awg_i1').getUIElement(s.section).setValue(config.interface_i1 || '');
+					s.getOption('awg_i2').getUIElement(s.section).setValue(config.interface_i2 || '');
+					s.getOption('awg_i3').getUIElement(s.section).setValue(config.interface_i3 || '');
+					s.getOption('awg_i4').getUIElement(s.section).setValue(config.interface_i4 || '');
+					s.getOption('awg_i5').getUIElement(s.section).setValue(config.interface_i5 || '');
+					s.getOption('awg_header_protection_key').getUIElement(s.section).setValue(config.interface_headerprotectionkey || '');
+					s.getOption('awg_content_padding_addition').getUIElement(s.section).setValue(config.interface_contentpaddingaddition || '');
+					s.getOption('awg_rekey_after_time').getUIElement(s.section).setValue(config.interface_rekeyaftertime || '');
+					s.getOption('awg_rekey_timeout').getUIElement(s.section).setValue(config.interface_rekeytimeout || '');
+					s.getOption('awg_reject_after_time').getUIElement(s.section).setValue(config.interface_rejectaftertime || '');
+					s.getOption('awg_keepalive_timeout').getUIElement(s.section).setValue(config.interface_keepalivetimeout || '');
+					s.getOption('awg_max_handshake_attempts').getUIElement(s.section).setValue(config.interface_maxhandshakeattempts || '');
+					s.getOption('awg_random_trailers').getUIElement(s.section).setValue((config.interface_randomtrailers == 'on' || +config.interface_randomtrailers) ? '1' : '0');
+					s.getOption('awg_disable_cookies').getUIElement(s.section).setValue((config.interface_disablecookies == 'on' || +config.interface_disablecookies) ? '1' : '0');
 
 					if (config.interface_dns)
 						s.getOption('dns').getUIElement(s.section).setValue(config.interface_dns);
@@ -650,9 +801,9 @@ return network.registerProtocol('amneziawg', {
 		o.placeholder = '51820';
 		o.datatype = 'port';
 
-		o = ss.option(form.Value, 'persistent_keepalive', _('Persistent Keep Alive'), _('Optional. Seconds between keep alive messages. Default is 0 (disabled). Recommended value if this device is behind a NAT is 25.'));
+		o = ss.option(form.Value, 'persistent_keepalive', _('Persistent Keep Alive'), _('Optional. Seconds between keep alive messages. Number or range, 0-65535 seconds. Default is 0 (disabled).'));
 		o.modalonly = true;
-		o.datatype = 'range(0,65535)';
+		o.datatype = 'string';
 		o.placeholder = '0';
 
 
@@ -665,6 +816,33 @@ return network.registerProtocol('amneziawg', {
 		o.createPeerConfig = function(section_id, endpoint, ips, eips, dns) {
 			const pub = s.formvalue(s.section, 'public_key');
 			const port = s.formvalue(s.section, 'listen_port') || '51820';
+
+			// AmneziaWG specific parameters
+			const jc = s.formvalue(s.section, 'awg_jc');
+			const jmin = s.formvalue(s.section, 'awg_jmin');
+			const jmax = s.formvalue(s.section, 'awg_jmax');
+			const s1 = s.formvalue(s.section, 'awg_s1');
+			const s2 = s.formvalue(s.section, 'awg_s2');
+			const s3 = s.formvalue(s.section, 'awg_s3');
+			const s4 = s.formvalue(s.section, 'awg_s4');
+			const h1 = s.formvalue(s.section, 'awg_h1');
+			const h2 = s.formvalue(s.section, 'awg_h2');
+			const h3 = s.formvalue(s.section, 'awg_h3');
+			const h4 = s.formvalue(s.section, 'awg_h4');
+			const i1 = s.formvalue(s.section, 'awg_i1');
+			const i2 = s.formvalue(s.section, 'awg_i2');
+			const i3 = s.formvalue(s.section, 'awg_i3');
+			const i4 = s.formvalue(s.section, 'awg_i4');
+			const i5 = s.formvalue(s.section, 'awg_i5');
+			const headerprotectionkey = s.formvalue(s.section, 'awg_header_protection_key');
+			const contentpaddingaddition = s.formvalue(s.section, 'awg_content_padding_addition');
+			const rekeyaftertime = s.formvalue(s.section, 'awg_rekey_after_time');
+			const rekeytimeout = s.formvalue(s.section, 'awg_rekey_timeout');
+			const rejectaftertime = s.formvalue(s.section, 'awg_reject_after_time');
+			const keepalivetimeout = s.formvalue(s.section, 'awg_keepalive_timeout');
+			const maxhandshakeattempts = s.formvalue(s.section, 'awg_max_handshake_attempts');
+			const randomtrailers = s.formvalue(s.section, 'awg_random_trailers');
+			const disablecookies = s.formvalue(s.section, 'awg_disable_cookies');
 			const prv = this.section.formvalue(section_id, 'private_key');
 			const psk = this.section.formvalue(section_id, 'preshared_key');
 			const eport = this.section.formvalue(section_id, 'endpoint_port');
@@ -681,6 +859,32 @@ return network.registerProtocol('amneziawg', {
 				eips && eips.length ? 'Address = ' + eips.join(', ') : '# Address not defined',
 				eport ? 'ListenPort = ' + eport : '# ListenPort not defined',
 				dns && dns.length ? 'DNS = ' + dns.join(', ') : '# DNS not defined',
+				// AmneziaWG specific parameters
+				jc ? 'Jc = ' + jc : '# Jc not defined',
+				jmin ? 'Jmin = ' + jmin : '# Jmin not defined',
+				jmax ? 'Jmax = ' + jmax : '# Jmax not defined',
+				s1 ? 'S1 = ' + s1 : '# S1 not defined',
+				s2 ? 'S2 = ' + s2 : '# S2 not defined',
+				s3 ? 'S3 = ' + s3 : '# S3 not defined',
+				s4 ? 'S4 = ' + s4 : '# S4 not defined',
+				h1 ? 'H1 = ' + h1 : '# H1 not defined',
+				h2 ? 'H2 = ' + h2 : '# H2 not defined',
+				h3 ? 'H3 = ' + h3 : '# H3 not defined',
+				h4 ? 'H4 = ' + h4 : '# H4 not defined',
+				i1 ? 'I1 = ' + i1 : '# I1 not defined',
+				i2 ? 'I2 = ' + i2 : '# I2 not defined',
+				i3 ? 'I3 = ' + i3 : '# I3 not defined',
+				i4 ? 'I4 = ' + i4 : '# I4 not defined',
+				i5 ? 'I5 = ' + i5 : '# I5 not defined',
+				headerprotectionkey ? 'HeaderProtectionKey = ' + headerprotectionkey : '# HeaderProtectionKey not defined',
+				contentpaddingaddition ? 'ContentPaddingAddition = ' + contentpaddingaddition : '# ContentPaddingAddition not defined',
+				rekeyaftertime ? 'RekeyAfterTime = ' + rekeyaftertime : '# RekeyAfterTime not defined',
+				rekeytimeout ? 'RekeyTimeout = ' + rekeytimeout : '# RekeyTimeout not defined',
+				rejectaftertime ? 'RejectAfterTime = ' + rejectaftertime : '# RejectAfterTime not defined',
+				keepalivetimeout ? 'KeepaliveTimeout = ' + keepalivetimeout : '# KeepaliveTimeout not defined',
+				maxhandshakeattempts ? 'MaxHandshakeAttempts = ' + maxhandshakeattempts : '# MaxHandshakeAttempts not defined',
+				randomtrailers ? 'RandomTrailers = ' + randomtrailers : '# RandomTrailers not defined',
+				disablecookies ? 'DisableCookies = ' + disablecookies : '# DisableCookies not defined',
 				'',
 				'[Peer]',
 				'PublicKey = ' + pub,

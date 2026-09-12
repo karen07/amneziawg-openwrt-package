@@ -1,3 +1,4 @@
+// AmneziaWG modifications: Copyright (C) 2026 Karen Khachatryan <karen0734@gmail.com>
 'use strict';
 'require view';
 'require rpc';
@@ -45,7 +46,32 @@ function handleInterfaceDetails(iface) {
 			_('Name'), iface.name,
 			_('Public Key'), E('code', [ iface.public_key ]),
 			_('Listen Port'), iface.listen_port,
-			_('Firewall Mark'), iface.fwmark != 'off' ? iface.fwmark : E('em', _('none'))
+			_('Firewall Mark'), iface.fwmark != 'off' ? iface.fwmark : E('em', _('none')),
+			_('Jc'), iface.jc,
+			_('Jmin'), iface.jmin,
+			_('Jmax'), iface.jmax,
+			_('S1'), iface.s1,
+			_('S2'), iface.s2,
+			_('S3'), iface.s3,
+			_('S4'), iface.s4,
+			_('H1'), iface.h1,
+			_('H2'), iface.h2,
+			_('H3'), iface.h3,
+			_('H4'), iface.h4,
+			_('I1'), iface.i1,
+			_('I2'), iface.i2,
+			_('I3'), iface.i3,
+			_('I4'), iface.i4,
+			_('I5'), iface.i5,
+			_('HeaderProtectionKey'), iface.header_protection_key == '(hidden)' ? E('em', _('configured')) : E('em', _('none')),
+			_('ContentPaddingAddition'), iface.content_padding_addition,
+			_('RekeyAfterTime'), iface.rekey_after_time,
+			_('RekeyTimeout'), iface.rekey_timeout,
+			_('RejectAfterTime'), iface.reject_after_time,
+			_('KeepaliveTimeout'), iface.keepalive_timeout,
+			_('MaxHandshakeAttempts'), iface.max_handshake_attempts,
+			_('RandomTrailers'), iface.random_trailers,
+			_('DisableCookies'), iface.disable_cookies,
 		]),
 		E('div', { 'class': 'right' }, [
 			E('button', {
@@ -66,7 +92,7 @@ function handlePeerDetails(peer) {
 			_('Received Data'), '%1024mB'.format(peer.transfer_rx),
 			_('Transmitted Data'), '%1024mB'.format(peer.transfer_tx),
 			_('Latest Handshake'), timestampToStr(+peer.latest_handshake),
-			_('Keep-Alive'), (peer.persistent_keepalive != 'off') ? _('every %ds', 'AmneziaWG keep alive interval').format(+peer.persistent_keepalive) : E('em', _('none')),
+			_('Keep-Alive'), (peer.persistent_keepalive != 'off') ? _('every %s seconds', 'AmneziaWG keep alive interval').format(peer.persistent_keepalive) : E('em', _('none')),
 		]),
 		E('div', { 'class': 'right' }, [
 			E('button', {
