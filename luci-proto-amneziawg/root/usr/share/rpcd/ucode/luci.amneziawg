@@ -34,14 +34,14 @@ function checkPeerHost(configHost, configPort, wgHost) {
 const methods = {
 	generatePsk: {
 		call: function() {
-			return { psk: command('wg genpsk 2>/dev/null') };
+			return { psk: command('awg genpsk 2>/dev/null') };
 		}
 	},
 
 	generateKeyPair: {
 		call: function() {
-			const priv = command('wg genkey 2>/dev/null');
-			const pub = command(`echo ${shellquote(priv)} | wg pubkey 2>/dev/null`);
+			const priv = command('awg genkey 2>/dev/null');
+			const pub = command(`echo ${shellquote(priv)} | awg pubkey 2>/dev/null`);
 
 			return { keys: { priv, pub } };
 		}
@@ -51,25 +51,25 @@ const methods = {
 		args: { privkey: "privkey" },
 		call: function(req) {
 			const priv = req.args?.privkey;
-			const pub = command(`echo ${shellquote(priv)} | wg pubkey 2>/dev/null`);
+			const pub = command(`echo ${shellquote(priv)} | awg pubkey 2>/dev/null`);
 
 			return { keys: { priv, pub } };
 		}
 	},
 
-	getWgInstances: {
+	getAwgInstances: {
 		call: function() {
 			const data = {};
 			let last_device;
 			let qr_pubkey = {};
 
 			const uci = cursor();
-			const wg_dump = popen("wg show all dump 2>/dev/null");
+			const awg_dump = popen("awg show all dump 2>/dev/null");
 
-			if (wg_dump) {
+			if (awg_dump) {
 				uci.load("network");
 
-				for (let line = wg_dump.read('line'); length(line); line = wg_dump.read('line')) {
+				for (let line = awg_dump.read('line'); length(line); line = awg_dump.read('line')) {
 					const record = split(rtrim(line, '\n'), '\t');
 
 					if (last_device != record[0]) {
@@ -91,7 +91,7 @@ const methods = {
 						let peer_name;
 						let peer_name_legacy;
 
-						uci.foreach('network', `wireguard_${last_device}`, (s) => {
+						uci.foreach('network', `amneziawg_${last_device}`, (s) => {
 							if (!s.disabled && s.public_key == record[1] && (!s.endpoint_host || checkPeerHost(s.endpoint_host, s.endpoint_port, record[3])))
 								peer_name = s.description;
 							if (s.public_key == record[1])
@@ -124,4 +124,4 @@ const methods = {
 	}
 };
 
-return { 'luci.wireguard': methods };
+return { 'luci.amneziawg': methods };
