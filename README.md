@@ -21,21 +21,21 @@ builds for supported OpenWrt targets.
 - [Навигация](#%D0%BD%D0%B0%D0%B2%D0%B8%D0%B3%D0%B0%D1%86%D0%B8%D1%8F)
 - [Разработка и проверка изменений](#%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0-%D0%B8-%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0-%D0%B8%D0%B7%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D0%B9)
 - [Сборка и установка](#%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0-%D0%B8-%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0)
-  - [Установить на роутер](#%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%B8%D1%82%D1%8C-%D0%BD%D0%B0-%D1%80%D0%BE%D1%83%D1%82%D0%B5%D1%80)
-  - [Собрать под роутер, но не устанавливать](#%D1%81%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D1%8C-%D0%BF%D0%BE%D0%B4-%D1%80%D0%BE%D1%83%D1%82%D0%B5%D1%80-%D0%BD%D0%BE-%D0%BD%D0%B5-%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%B0%D0%B2%D0%BB%D0%B8%D0%B2%D0%B0%D1%82%D1%8C)
-  - [Собрать по явному target/subtarget/pkgarch](#%D1%81%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D1%8C-%D0%BF%D0%BE-%D1%8F%D0%B2%D0%BD%D0%BE%D0%BC%D1%83-targetsubtargetpkgarch)
-  - [GitHub Actions matrix](#github-actions-matrix)
-  - [GitHub Actions workflow](#github-actions-workflow)
-  - [Release artifacts](#release-artifacts)
-  - [Генерация из upstream WireGuard пакетов](#%D0%B3%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D1%8F-%D0%B8%D0%B7-upstream-wireguard-%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2)
+  - [Установка на роутер](#%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0-%D0%BD%D0%B0-%D1%80%D0%BE%D1%83%D1%82%D0%B5%D1%80)
+  - [Сборка для роутера без установки](#%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0-%D0%B4%D0%BB%D1%8F-%D1%80%D0%BE%D1%83%D1%82%D0%B5%D1%80%D0%B0-%D0%B1%D0%B5%D0%B7-%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B8)
+  - [Сборка с явными target/subtarget/pkgarch](#%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0-%D1%81-%D1%8F%D0%B2%D0%BD%D1%8B%D0%BC%D0%B8-targetsubtargetpkgarch)
+  - [Матрица GitHub Actions](#%D0%BC%D0%B0%D1%82%D1%80%D0%B8%D1%86%D0%B0-github-actions)
+  - [Процесс GitHub Actions](#%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81-github-actions)
+  - [Артефакты релиза](#%D0%B0%D1%80%D1%82%D0%B5%D1%84%D0%B0%D0%BA%D1%82%D1%8B-%D1%80%D0%B5%D0%BB%D0%B8%D0%B7%D0%B0)
+  - [Генерация из upstream-пакетов WireGuard](#%D0%B3%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D1%8F-%D0%B8%D0%B7-upstream-%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2-wireguard)
   - [Установка готовых `.apk`](#%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0-%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%D1%8B%D1%85-apk)
 - [Что входит в проект](#%D1%87%D1%82%D0%BE-%D0%B2%D1%85%D0%BE%D0%B4%D0%B8%D1%82-%D0%B2-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82)
 - [Чем этот проект отличается](#%D1%87%D0%B5%D0%BC-%D1%8D%D1%82%D0%BE%D1%82-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82-%D0%BE%D1%82%D0%BB%D0%B8%D1%87%D0%B0%D0%B5%D1%82%D1%81%D1%8F)
-  - [1. Автопатч от ванильной WireGuard базы](#1-%D0%B0%D0%B2%D1%82%D0%BE%D0%BF%D0%B0%D1%82%D1%87-%D0%BE%D1%82-%D0%B2%D0%B0%D0%BD%D0%B8%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9-wireguard-%D0%B1%D0%B0%D0%B7%D1%8B)
-  - [2. Отдельный OpenWrt пакет для kernel module](#2-%D0%BE%D1%82%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-openwrt-%D0%BF%D0%B0%D0%BA%D0%B5%D1%82-%D0%B4%D0%BB%D1%8F-kernel-module)
+  - [1. Автопатч исходного WireGuard](#1-%D0%B0%D0%B2%D1%82%D0%BE%D0%BF%D0%B0%D1%82%D1%87-%D0%B8%D1%81%D1%85%D0%BE%D0%B4%D0%BD%D0%BE%D0%B3%D0%BE-wireguard)
+  - [2. Отдельный пакет модуля ядра OpenWrt](#2-%D0%BE%D1%82%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D0%BF%D0%B0%D0%BA%D0%B5%D1%82-%D0%BC%D0%BE%D0%B4%D1%83%D0%BB%D1%8F-%D1%8F%D0%B4%D1%80%D0%B0-openwrt)
   - [3. Нормальная цепочка зависимостей пакетов](#3-%D0%BD%D0%BE%D1%80%D0%BC%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F-%D1%86%D0%B5%D0%BF%D0%BE%D1%87%D0%BA%D0%B0-%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9-%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2)
   - [4. Поддержка готовых сборок и локальной разработки](#4-%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0-%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%D1%8B%D1%85-%D1%81%D0%B1%D0%BE%D1%80%D0%BE%D0%BA-%D0%B8-%D0%BB%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B8)
-  - [5. OpenWrt 25.12+ и apk based сборки](#5-openwrt-2512-%D0%B8-apk-based-%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B8)
+  - [5. Сборки OpenWrt 25.12+ на основе APK](#5-%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B8-openwrt-2512-%D0%BD%D0%B0-%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B5-apk)
 - [Что добавляется поверх WireGuard](#%D1%87%D1%82%D0%BE-%D0%B4%D0%BE%D0%B1%D0%B0%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%D1%81%D1%8F-%D0%BF%D0%BE%D0%B2%D0%B5%D1%80%D1%85-wireguard)
 - [Для кого этот проект](#%D0%B4%D0%BB%D1%8F-%D0%BA%D0%BE%D0%B3%D0%BE-%D1%8D%D1%82%D0%BE%D1%82-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82)
 - [Не цели проекта](#%D0%BD%D0%B5-%D1%86%D0%B5%D0%BB%D0%B8-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B0)
@@ -47,12 +47,19 @@ builds for supported OpenWrt targets.
 Для установки пакета на роутер см. раздел
 [Сборка и установка](#%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0-%D0%B8-%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0).
 Если нужно собирать или публиковать пакеты для нескольких целей,
-смотрите [GitHub Actions matrix](#github-actions-matrix) и
-[Release artifacts](#release-artifacts).
+смотрите [Матрица GitHub Actions](#%D0%BC%D0%B0%D1%82%D1%80%D0%B8%D1%86%D0%B0-github-actions) и
+[Артефакты релиза](#%D0%B0%D1%80%D1%82%D0%B5%D1%84%D0%B0%D0%BA%D1%82%D1%8B-%D1%80%D0%B5%D0%BB%D0%B8%D0%B7%D0%B0).
 Раздел [Чем этот проект отличается](#%D1%87%D0%B5%D0%BC-%D1%8D%D1%82%D0%BE%D1%82-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82-%D0%BE%D1%82%D0%BB%D0%B8%D1%87%D0%B0%D0%B5%D1%82%D1%81%D1%8F)
 объясняет отличия от обычных пакетов WireGuard.
 
 ## Разработка и проверка изменений
+
+**Опорные символы для изменения поведения:**
+
+1. `generate.py:AwgOpt` и `generate.py:run` - модель опций и стадии генерации пакетов; перед
+   правкой файла пакета проверяйте, не перезаписывается ли он генератором.
+1. `proto_amneziawg_setup`, `proto_amneziawg_teardown` - жизненный цикл сетевого протокола в
+   `amneziawg-tools/files/amneziawg.sh`; изменение опций затрагивает также UCI и LuCI.
 
 **Основные точки изменения:**
 
@@ -60,9 +67,26 @@ builds for supported OpenWrt targets.
 - `amneziawg/Makefile` - параметры kernel module;
 - `amneziawg-tools/Makefile` - userspace-утилиты;
 - `luci-proto-amneziawg/Makefile` - компонент LuCI;
+- `luci-proto-amneziawg/root/usr/share/luci/menu.d/luci-proto-amneziawg.json` -
+  маршрут страницы состояния и зависимость от разрешения LuCI ACL;
+- `luci-proto-amneziawg/root/usr/share/rpcd/acl.d/luci-amneziawg.json` -
+  разрешения для чтения статуса и вызовов генерации ключей через ubus;
 - `amneziawg-tools/files/amneziawg.sh` - интеграция протокола с OpenWrt;
 - `openwrt-build.env` - параметры CI;
 - `.github/workflows/openwrt-build.yml` - автоматическая сборка.
+
+**Восстановление этапов генерации:** `rebuild-commits.sh` последовательно вызывает
+`generate.py` для стадий `vanilla`, `files`, `text` и `full`, делая отдельный
+Git-коммит после каждой стадии. Скрипт меняет рабочее дерево и историю коммитов;
+для обычной правки пакета он не нужен. Перед его использованием проверяйте
+состояние Git и ожидаемый результат генерации.
+
+**Граница UI и прав:** запись нового действия в LuCI требует проверить не только
+страницу, но и `menu.d` и `rpcd/acl.d`. В ACL чтение `getAwgInstances`
+отличается от разрешённых операций генерации ключей
+`generateKeyPair`, `getPublicAndPrivateKeyFromPrivate` и `generatePsk`.
+Изменения этих прав в генерируемом пакете должны быть согласованы с
+соответствующим преобразованием в `generate.py`.
 
 **Проверка изменений:** Генерируемые файлы пакетов зависят от `generate.py`: перед ручной правкой определите, не будет ли она перезаписана следующей генерацией. Проверяйте согласованность модуля ядра, userspace и LuCI с целевой версией OpenWrt; не считайте успешный workflow доказательством работы протокола на роутере.
 
@@ -103,7 +127,7 @@ amneziawg-tools
 luci-proto-amneziawg
 ```
 
-### Установить на роутер
+### Установка на роутер
 
 ```sh
 ./openwrt-build.sh install all router
@@ -134,7 +158,7 @@ luci-proto-amneziawg
 ./openwrt-build.sh install all router
 ```
 
-### Собрать под роутер, но не устанавливать
+### Сборка для роутера без установки
 
 ```sh
 ./openwrt-build.sh build-router all router 25.12.5
@@ -148,7 +172,7 @@ luci-proto-amneziawg
 ./openwrt-build.sh build-router all router 25.12.5 awgrelease
 ```
 
-### Собрать по явному target/subtarget/pkgarch
+### Сборка с явными target/subtarget/pkgarch
 
 ```sh
 ./openwrt-build.sh build-target all 25.12.5 x86 64 x86_64 awgrelease
@@ -174,7 +198,7 @@ luci-proto-amneziawg
 rm ./openwrt-build.sh
 ```
 
-### GitHub Actions matrix
+### Матрица GitHub Actions
 
 `openwrt-matrix.py` из [openwrt-package-ci](https://github.com/karen07/openwrt-package-ci) генерирует matrix для OpenWrt targets/subtargets по данным с `downloads.openwrt.org`.
 
@@ -233,7 +257,7 @@ microchipsw/*
 
 В GitHub Actions этот список используется для параллельной сборки `.apk` под разные OpenWrt targets.
 
-### GitHub Actions workflow
+### Процесс GitHub Actions
 
 Workflow `.github/workflows/openwrt-build.yml` остается точкой входа этого репозитория и вызывает reusable workflow из [openwrt-package-ci](https://github.com/karen07/openwrt-package-ci).
 
@@ -252,7 +276,7 @@ Workflow `.github/workflows/openwrt-build.yml` остается точкой в�
 | `include` | Include patterns для target/subtarget. По умолчанию: `*`. |
 | `exclude` | Exclude patterns. По умолчанию: `microchipsw/lan969x`. |
 
-### Release artifacts
+### Артефакты релиза
 
 GitHub Actions собирает `.apk` пакеты и прикладывает их к GitHub Release с тегом OpenWrt версии, например `v25.12.5`.
 
@@ -276,7 +300,7 @@ luci-proto-amneziawg_v25.12.5_aarch64_cortex-a53_qualcommax_ipq807x.apk
 - `<OPENWRT_ARCH>` - значение `OPENWRT_ARCH` или package architecture;
 - `<TARGET>` и `<SUBTARGET>` - OpenWrt target/subtarget, для которых собран пакет.
 
-### Генерация из upstream WireGuard пакетов
+### Генерация из upstream-пакетов WireGuard
 
 `generate.py` полностью формирует локальные каталоги `amneziawg-tools`, `luci-proto-amneziawg` и `amneziawg` из upstream-источников.
 
@@ -413,7 +437,7 @@ amneziawg-openwrt-package/
 
 ## Чем этот проект отличается
 
-### 1. Автопатч от ванильной WireGuard базы
+### 1. Автопатч исходного WireGuard
 
 `amneziawg-tools`, `luci-proto-amneziawg` и `kmod-amneziawg` не ведутся как ручной форк. Их целевое состояние полностью генерируется через `generate.py`:
 
@@ -426,7 +450,7 @@ amneziawg-openwrt-package/
 
 Это упрощает обновление под новые версии OpenWrt и LuCI. Вместо ручного переноса больших кусков кода можно заново взять чистую upstream базу и применить проектный патч.
 
-### 2. Отдельный OpenWrt пакет для kernel module
+### 2. Отдельный пакет модуля ядра OpenWrt
 
 `kmod-amneziawg` оформлен как отдельный OpenWrt kernel package. Его `Makefile` не является отдельным ручным source-файлом: `generate.py` создаёт его на стадии `full`, подставляя `AWG_KERNEL_VERSION`. На стадиях `vanilla`, `files` и `text` каталог `amneziawg/` отсутствует, поскольку ванильного WireGuard-пакета, из которого его можно было бы получить rename-ом, нет.
 
@@ -457,7 +481,7 @@ luci-proto-amneziawg
 
 Это удобно для разработки: можно менять локальные файлы пакетов и сразу собирать их под конкретный роутер или target/subtarget.
 
-### 5. OpenWrt 25.12+ и apk based сборки
+### 5. Сборки OpenWrt 25.12+ на основе APK
 
 Проект ориентирован на новые версии OpenWrt с `.apk` пакетами.
 
