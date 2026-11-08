@@ -7,14 +7,14 @@
 'require ui';
 
 
-var callGetWgInstances = rpc.declare({
-	object: 'luci.wireguard',
-	method: 'getWgInstances'
+var callGetAwgInstances = rpc.declare({
+	object: 'luci.amneziawg',
+	method: 'getAwgInstances'
 });
 
 function timestampToStr(timestamp) {
 	if (timestamp < 1)
-		return _('Never', 'No WireGuard peer handshake yet');
+		return _('Never', 'No AmneziaWG peer handshake yet');
 
 	var seconds = (Date.now() / 1000) - timestamp;
 	var ago;
@@ -66,7 +66,7 @@ function handlePeerDetails(peer) {
 			_('Received Data'), '%1024mB'.format(peer.transfer_rx),
 			_('Transmitted Data'), '%1024mB'.format(peer.transfer_tx),
 			_('Latest Handshake'), timestampToStr(+peer.latest_handshake),
-			_('Keep-Alive'), (peer.persistent_keepalive != 'off') ? _('every %ds', 'WireGuard keep alive interval').format(+peer.persistent_keepalive) : E('em', _('none')),
+			_('Keep-Alive'), (peer.persistent_keepalive != 'off') ? _('every %ds', 'AmneziaWG keep alive interval').format(+peer.persistent_keepalive) : E('em', _('none')),
 		]),
 		E('div', { 'class': 'right' }, [
 			E('button', {
@@ -107,7 +107,7 @@ function renderPeerTable(instanceName, peers) {
 					]),
 					E('span', {
 						'class': 'ifacebadge hide-sm',
-						'data-tooltip': _('Public key: %h', 'Tooltip displaying full WireGuard peer public key').format(peer.public_key)
+						'data-tooltip': _('Public key: %h', 'Tooltip displaying full AmneziaWG peer public key').format(peer.public_key)
 					}, [
 						E('code', [ peer.public_key.replace(/^(.{5}).+(.{6})$/, '$1…$2') ])
 					])
@@ -132,24 +132,24 @@ return view.extend({
 
 	renderIfaces: function(ifaces) {
 		var res = [
-			E('h2', [ _('WireGuard Status') ])
+			E('h2', [ _('AmneziaWG Status') ])
 		];
 
 		for (var instanceName in ifaces) {
 			res.push(
-				E('h3', [ _('Instance "%h"', 'WireGuard instance heading').format(instanceName) ]),
+				E('h3', [ _('Instance "%h"', 'AmneziaWG instance heading').format(instanceName) ]),
 				E('p', {
 					'style': 'cursor:pointer',
 					'click': ui.createHandlerFn(this, handleInterfaceDetails, ifaces[instanceName])
 				}, [
 					E('span', { 'class': 'ifacebadge' }, [
-						E('img', { 'src': L.resource('icons', 'wireguard.svg'), 'style': 'width:32px;height:32px' }),
+						E('img', { 'src': L.resource('icons', 'amneziawg.svg'), 'style': 'width:32px;height:32px' }),
 						'\xa0',
 						instanceName
 					]),
 					E('span', { 'style': 'opacity:.8' }, [
 						' · ',
-						_('Port %d', 'WireGuard listen port').format(ifaces[instanceName].listen_port),
+						_('Port %d', 'AmneziaWG listen port').format(ifaces[instanceName].listen_port),
 						' · ',
 						E('code', { 'click': '' }, [ ifaces[instanceName].public_key ])
 					])
@@ -160,7 +160,7 @@ return view.extend({
 
 		if (res.length == 1)
 			res.push(E('p', { 'class': 'center', 'style': 'margin-top:5em' }, [
-				E('em', [ _('No WireGuard interfaces configured.') ])
+				E('em', [ _('No AmneziaWG interfaces configured.') ])
 			]));
 
 		return E([], res);
@@ -168,7 +168,7 @@ return view.extend({
 
 	render: function() {
 		poll.add(L.bind(function () {
-			return callGetWgInstances().then(L.bind(function(ifaces) {
+			return callGetAwgInstances().then(L.bind(function(ifaces) {
 				dom.content(
 					document.querySelector('#view'),
 					this.renderIfaces(ifaces)
@@ -177,7 +177,7 @@ return view.extend({
 		}, this), 5);
 
 		return E([], [
-			E('h2', [ _('WireGuard Status') ]),
+			E('h2', [ _('AmneziaWG Status') ]),
 			E('p', { 'class': 'center', 'style': 'margin-top:5em' }, [
 				E('em', [ _('Loading data…') ])
 			])
